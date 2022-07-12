@@ -18,9 +18,9 @@ void rev_string(char *s)
 	i = len;
 	while (--i >= len / 2)
 	{
-												j = len - i - 1;
-												temp = s[j];
-												s[j] = s[i];
-												s[i] = temp;
+		j = len - i - 1;
+		temp = s[j];
+		s[j] = s[i];
+		s[i] = temp;
 	}
 }
