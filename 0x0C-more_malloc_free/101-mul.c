@@ -1,113 +1,165 @@
-#include<string.h>
 #include "main.h"
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
- * _isdigit - checks if character is digit
- * @c: the character to check
- *
- * Return: 1 if digit, 0 otherwise
+ * str_len - calculates length of string
+ * @str: pointer to string
+ * Return: length of string
  */
-int _isdigit(int c)
+int str_len(char *str)
 {
-	return (c >= '0' && c <= '9');
+	int len;
+
+	for (len = 0; *str != '\0'; len++)
+		str++;
+	return (len);
 }
 
 /**
- * _strlen - returns the length of a string
- * @s: the string whose length to check
- *
- * Return: integer length of string
+ * _calloc - allocates memory for an array using malloc
+ * @bytes: bytes of memory needed per size
+ * @size: size of data struct (array)
+ * Return: pointer to the allocated memory
  */
-int _strlen(char *s)
+void *_calloc(unsigned int bytes, unsigned int size)
+{
+	unsigned int i;
+	char *p;
+
+	if (bytes == 0 || size == 0)
+		return (NULL);
+	p = malloc(size * bytes);
+	if (p == NULL)
+		return (NULL);
+	for (i = 0; i < bytes * size; i++)
+		p[i] = 0;
+	return (p);
+}
+
+/**
+ * add_arrays - adds 2 arrays of ints
+ * @mul_result: pointer to array of products
+ * @sum_result: pointer to array of sums
+ * @len_r: length of both arrays
+ * Return: void
+ */
+void add_arrays(int *mul_result, int *sum_result, int len_r)
+{
+	int i = 0, len_r2 = len_r - 1, carry = 0, sum;
+
+	while (i < len_r)
+	{
+		sum = carry + mul_result[len_r2] + sum_result[len_r2];
+		sum_result[len_r2] = sum % 10;
+		carry = sum / 10;
+		i++;
+		len_r2--;
+	}
+}
+
+/**
+ * is_digit - checks for digits
+ * @c: character to check if digit
+ * Return: 0 failure, 1 success
+ */
+int is_digit(char c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	printf("Error\n");
+	return (0);
+}
+
+/**
+ * multiply - multiplies 2 #'s, prints result, must be 2 #'s
+ * @num1: factor # 1 (is the smaller of 2 numbers)
+ * @len_1: length of factor 1
+ * @num2: factor # 2 (is the larger of 2 numbers)
+ * @len_2: length of factor 2
+ * @len_r: length of result arrays
+ * Return: 0 fail, 1 success
+ */
+int *multiply(char *num1, int len_1, char *num2, int len_2, int len_r)
+{
+	int i = 0, i1 = len_1 - 1;
+	int i2, product, carry, digit, *mul_result, *sum_result;
+
+	sum_result = _calloc(sizeof(int), (len_r));
+	while (i < len_1)
+	{
+		mul_result = _calloc(sizeof(int), len_r);
+		i2 = len_2 - 1, digit = (len_r - 1 - i);
+		if (!is_digit(num1[i1]))
+			return (NULL);
+		carry = 0;
+		while (i2 >= 0)
+		{
+			if (!is_digit(num2[i2]))
+				return (NULL);
+			product = (num1[i1] - '0') * (num2[i2] - '0');
+			product += carry;
+			mul_result[digit] += product % 10;
+			carry = product / 10;
+			digit--, i2--;
+		}
+		add_arrays(mul_result, sum_result, len_r);
+		free(mul_result);
+		i++, i1--;
+	}
+	return (sum_result);
+}
+
+/**
+ * print_me - prints my array of the hopeful product here
+ * @sum_result: pointer to int array with numbers to add
+ * @len_r: length of result array
+ * Return: void
+ */
+void print_me(int *sum_result, int len_r)
 {
 	int i = 0;
 
-	while (*s++)
+	while (sum_result[i] == 0 && i < len_r)
 		i++;
-	return (i);
+	if (i == len_r)
+		putchar('0');
+	while (i < len_r)
+		putchar(sum_result[i++] + '0');
+	putchar('\n');
 }
 
 /**
- * big_multiply - multiply two big number strings
- * @s1: the first big number string
- * @s2: the second big number string
- *
- * Return: the product big number string
- */
-char *big_multiply(char *s1, char *s2)
-{
-	char *r;
-	int l1, l2, a, b, c, x;
-
-	l1 = _strlen(s1);
-	l2 = _strlen(s2);
-	r = malloc(a = x = l1 + l2);
-	if (!r)
-		printf("Error\n"), exit(98);
-	while (a--)
-		r[a] = 0;
-
-	for (l1--; l1 >= 0; l1--)
-	{
-		if (!_isdigit(s1[l1]))
-		{
-			free(r);
-			printf("Error\n"), exit(98);
-		}
-		a = s1[l1] - '0';
-		c = 0;
-
-		for (l2 = _strlen(s2) - 1; l2 >= 0; l2--)
-		{
-			if (!_isdigit(s2[l2]))
-			{
-				free(r);
-				printf("Error\n"), exit(98);
-			}
-			b = s2[l2] - '0';
-
-			c += r[l1 + l2 + 1] + (a * b);
-			r[l1 + l2 + 1] = c % 10;
-
-			c /= 10;
-		}
-		if (c)
-			r[l1 + l2 + 1] += c;
-	}
-	return (r);
-}
-
-
-/**
- * main - multiply two big number strings
- * @argc: the number of arguments
- * @argv: the argument vector
- *
- * Return: Always 0 on success.
+ * main - multiply 2 input #'s of large lengths and print result or print Error
+ * @argc: arguments count
+ * @argv: array of arguments (pointers)
+ * Return: 0 on Success, 98 upon failure
  */
 int main(int argc, char **argv)
 {
-	char *r;
-	int a, c, x;
+	int len_1, len_2, len_r, temp, *sum_result;
+	char *num1, *num2;
 
 	if (argc != 3)
-		printf("Error\n"), exit(98);
-
-	x = _strlen(argv[1]) + _strlen(argv[2]);
-	r = big_multiply(argv[1], argv[2]);
-	c = 0;
-	a = 0;
-	while (c < x)
 	{
-		if (r[c])
-			a = 1;
-		if (a)
-			_putchar(r[c] + '0');
-		c++;
+		printf("Error\n");
+		exit(98);
 	}
-	if (!a)
-		_putchar('0');
-	_putchar('\n');
-	free(r);
+
+	len_1 = str_len(argv[1]), len_2 = str_len(argv[2]);
+	len_r = len_1 + len_2;
+	if (len_1 < len_2)
+		num1 = argv[1], num2 = argv[2];
+	else
+	{
+		num1 = argv[2], num2 = argv[1];
+		temp = len_2, len_2 = len_1, len_1 = temp;
+	}
+
+	sum_result = multiply(num1, len_1, num2, len_2, len_r);
+	if (sum_result == NULL)
+		exit(98);
+	print_me(sum_result, len_r);
 	return (0);
 }
