@@ -2,7 +2,7 @@
 
 /**
  * main - Program to print the filename it was compiled from
- * return 0;
+ * Return 0;
  */
 int main(void)
 {
