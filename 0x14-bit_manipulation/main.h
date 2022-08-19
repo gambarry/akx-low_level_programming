@@ -2,6 +2,8 @@
 #define __MAIN_H__
 #include <stdio.h>
 
+#define BYTE_LENGHT 8
+
 unsigned int binary_to_uint(const char *b);
 void print_binary(unsigned long int n);
 int _putchar(char c);

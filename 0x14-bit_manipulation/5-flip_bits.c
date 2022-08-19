@@ -2,24 +2,20 @@
 #include "main.h"
 
 /**
- * clear_bit - sets the value of a bit to 0.
- * at a given index.
- * @n: pointer of an unsigned long int.
- * @index: index of the bit.
+ * flip_bits - returns hamming distance of two bit words
+ * which is the number of bits you would need to flip to get
+ * from one number to another
+ * @n: the first bit word
+ * @m: the second bit word
  *
- * Return: 1 if it worked, -1 if it didn't.
+ * Return: the hamming distance
  */
-int clear_bit(unsigned long int *n, unsigned int index)
+unsigned int flip_bits(unsigned long int n, unsigned long int m)
 {
-	unsigned int m;
+	int shift = (sizeof(n) * BYTE_LENGHT);
+	int dist = 0;
 
-	if (index > 63)
-		return (-1);
-
-	m = 1 << index;
-
-	if (*n & m)
-		*n ^= m;
-
-	return (1);
+	while (shift--)
+		dist += (n >> shift & 1) != (m >> shift & 1);
+	return (dist);
 }
